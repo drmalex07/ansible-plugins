@@ -1,6 +1,6 @@
 
 def _flatten_items(items):
-    ''' A simple flattening routine based on the type of each value item.'''
+    '''A simple flattening routine based on the type of each value item.'''
     res = {}
     for k,v in items:
         # Detect value type
