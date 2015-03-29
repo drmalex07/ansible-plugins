@@ -2,14 +2,14 @@
 
 A collection of (possibly) usefull Ansible plugins.
 
-### HowTo
+### How To
 
-Normally, in order to make Ansible scan your custom plugin directories, you should
+Normally, in order to make Ansible scan your custom plugin directories (and load implementing classes), you should
 provide the proper paths inside the `defaults` section of your active `ansible.cfg` file.
 See also the docs on [The Ansible Configuration File](http://docs.ansible.com/intro_configuration.html).
 
-For example, if you checkout this repository to an `ansible_plugins` folder of your main project
-(e.g. as a git submodule), you could provide a similar configuration:
+For example, if you checkout this repository to an `ansible_plugins` folder under your main project's root folder
+(e.g. as a git submodule), you could provide the following settings:
 
 ```ini
 [defaults]
@@ -17,5 +17,6 @@ For example, if you checkout this repository to an `ansible_plugins` folder of y
 # other settings ...
 
 filter_plugins = ./ansible_plugins/filter_plugins:/usr/local/share/ansible_plugins/filter_plugins
+
 lookup_plugins = ./ansible_plugins/lookup_plugins:/usr/local/share/ansible_plugins/lookup_plugins
 ```
