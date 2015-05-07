@@ -20,7 +20,7 @@ class FilterModule(object):
         '''Format a dict as KV pairs'''
         f = lambda k, v: '{0}={1}'.format(k, v) if v else str(k)
         return sep.join([f(k, v)
-            for k, v in d.items() if (not v or isinstance(v, basestring))])
+            for k, v in d.items() if (not v or isinstance(v, (basestring, int, float)))])
 
     @staticmethod
     def map_keys(d, keys, source_path=None, path_delimiter='.'):
