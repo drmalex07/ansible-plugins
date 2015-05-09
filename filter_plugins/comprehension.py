@@ -1,9 +1,24 @@
+#!/usr/bin/env python
+
+scalar_types = (basestring, int, float, complex, bool)
+
+def _flatten(pres, y):
+    if isinstance(y, scalar_types):
+        pres.append(y)
+    else:
+        for yy in y:
+            pres = _flatten(pres, yy)
+    return pres
 
 class FilterModule(object):
     '''Provide Jinja2 filters for Ansible
     
     The filters below are simplified wrappers on dict/list comprehension operations. 
     '''
+
+    @staticmethod
+    def flatten_list(l):
+        return reduce(_flatten, l, [])
     
     @staticmethod
     def list_values(d):
@@ -20,7 +35,7 @@ class FilterModule(object):
         '''Format a dict as KV pairs'''
         f = lambda k, v: '{0}={1}'.format(k, v) if v else str(k)
         return sep.join([f(k, v)
-            for k, v in d.items() if (not v or isinstance(v, (basestring, int, float)))])
+            for k, v in d.items() if (not v or isinstance(v, scalar_types))])
 
     @staticmethod
     def map_keys(d, keys, source_path=None, path_delimiter='.'):
@@ -47,6 +62,7 @@ class FilterModule(object):
 
     def filters(self):
         return {
+           'flatten_list': self.flatten_list,
            'map_keys': self.map_keys,
            'list_values': self.list_values,
            'list_keys': self.list_keys,
