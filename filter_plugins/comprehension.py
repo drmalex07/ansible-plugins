@@ -45,6 +45,11 @@ class FilterModule(object):
             return l[0]
     
     @staticmethod
+    def to_map(l, item_key):
+        '''Convert a list into a dict using a given key from each item.'''
+        return {x[item_key]: x for x in l if item_key in x}
+    
+    @staticmethod
     def flatten_list(l):
         return reduce(_flatten, l, [])
     
@@ -112,4 +117,5 @@ class FilterModule(object):
            'list_keys': self.list_keys,
            'to_kv_pairs': self.to_kv_pairs,
            'filter_by_key': self.filter_by_key,
+           'to_map': self.to_map,
         }
