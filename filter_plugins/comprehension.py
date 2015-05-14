@@ -1,6 +1,24 @@
 #!/usr/bin/env python
 
+import operator
+
 scalar_types = (basestring, int, float, complex, bool)
+
+unary_ops = {
+   'not': operator.not_,
+   'truth': operator.truth,
+   'is': operator.is_,
+   'is_not': operator.is_not,
+}
+
+binary_ops = {
+   'eq': operator.eq,
+   'le': operator.le,
+   'ge': operator.ge,
+   'lt': operator.lt,
+   'gt': operator.gt,
+   'ne': operator.ne,
+}
 
 def _flatten(pres, y):
     if isinstance(y, scalar_types):
@@ -16,6 +34,16 @@ class FilterModule(object):
     The filters below are simplified wrappers on dict/list comprehension operations. 
     '''
 
+    @staticmethod
+    def one(l):
+        n = len(l)
+        if n > 1:
+            raise ValueError('The list contains more than 1 element')
+        elif n == 0:
+            raise ValueError('The list is empty')
+        else:
+            return l[0]
+    
     @staticmethod
     def flatten_list(l):
         return reduce(_flatten, l, [])
@@ -60,11 +88,28 @@ class FilterModule(object):
             res = {k: d.get(k) for k in keys}
         return res
 
+    @staticmethod
+    def filter_by_key(l, key, op='exists', value=None):
+        pred = None
+        if op == 'exists':
+            pred = lambda x: key in x
+        elif op in unary_ops:
+            t = unary_ops[op]
+            pred = lambda x: (key in x) and t(x.get(key))
+        elif op in binary_ops:
+            t = binary_ops[op]
+            pred = lambda x: (key in x) and t(x.get(key), value)
+        if not pred:
+            raise ValueError('Unknown operator: %s' %(op))
+        return filter(pred, l)
+    
     def filters(self):
         return {
+           'one': self.one,
            'flatten_list': self.flatten_list,
            'map_keys': self.map_keys,
            'list_values': self.list_values,
            'list_keys': self.list_keys,
            'to_kv_pairs': self.to_kv_pairs,
+           'filter_by_key': self.filter_by_key,
         }
