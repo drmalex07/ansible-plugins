@@ -74,6 +74,9 @@ class FilterModule(object):
     def map_keys(d, keys, source_path=None, path_delimiter='.'):
         '''Map keys on values from a set of (possibly nested) keys in an existing dict.
         
+        If `keys` is the special value "*", then all keys from d are used. In any other
+        case, an iterable of keys is expected.
+
         If `source_path` is supplied, then it is expected to be a format string and 
         contain placeholder for the current key item, e.g.:
         
@@ -82,8 +85,12 @@ class FilterModule(object):
         >>>  map_keys(d, ['aa', 'bb'], 'prefix-{0}-suffix.version')  # visits nested keys
         
         '''
+
+        if keys == '*':
+            keys = d.keys()
+        else:
+            assert isinstance(keys, (list, set)), 'Expected an iterable of keys'
         
-        assert isinstance(keys, (list, set)), 'Expected an iterable'
         res = None
         if isinstance(source_path, str):
             f = lambda z,k: z.get(k) if z else None
@@ -91,6 +98,7 @@ class FilterModule(object):
                 for k in keys}
         else:
             res = {k: d.get(k) for k in keys}
+        
         return res
 
     @staticmethod
