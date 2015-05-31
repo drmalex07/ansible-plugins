@@ -3,6 +3,7 @@
 import operator
 
 scalar_types = (basestring, int, float, complex, bool)
+list_types = (list, set, tuple)
 
 unary_ops = {
    'not': operator.not_,
@@ -20,12 +21,12 @@ binary_ops = {
    'ne': operator.ne,
 }
 
-def _flatten(pres, y):
-    if isinstance(y, scalar_types):
+def _flatten_list(pres, y):
+    if not isinstance(y, list_types):
         pres.append(y)
     else:
         for yy in y:
-            pres = _flatten(pres, yy)
+            pres = _flatten_list(pres, yy)
     return pres
 
 class FilterModule(object):
@@ -51,7 +52,7 @@ class FilterModule(object):
     
     @staticmethod
     def flatten_list(l):
-        return reduce(_flatten, l, [])
+        return reduce(_flatten_list, l, [])
     
     @staticmethod
     def list_values(d):
