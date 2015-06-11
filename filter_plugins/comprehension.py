@@ -82,7 +82,7 @@ class FilterModule(object):
             for k, v in d.items() if (not v or isinstance(v, scalar_types))])
 
     @staticmethod
-    def map_keys(d, keys, source_path=None, path_delimiter='.'):
+    def map_keys(d, keys, source_path=None, path_delimiter='.', decode_json=False):
         '''Map keys on values from a set of (possibly nested) keys in an existing dict.
         
         If `keys` is the special value "*", then all keys from d are used. In any other
@@ -97,11 +97,13 @@ class FilterModule(object):
         
         '''
 
+        # Find set of keys
         if keys == '*':
             keys = d.keys()
         else:
             assert isinstance(keys, (list, set)), 'Expected an iterable of keys'
         
+        # Map keys to values
         res = None
         if isinstance(source_path, str):
             f = lambda z,k: z.get(k) if z else None
@@ -110,7 +112,11 @@ class FilterModule(object):
         else:
             res = {k: d.get(k) for k in keys}
         
-        return res
+        # Done; decode values as JSON if requested
+        if decode_json:
+            return {k: json.loads(v) for k, v in res.iteritems()}
+        else:
+            return res
 
     @staticmethod
     def filter_by_key(l, key, op='exists', value=None):
