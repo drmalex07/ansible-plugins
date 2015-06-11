@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import operator
+import json
 
 scalar_types = (basestring, int, float, complex, bool)
 list_types = (list, set, tuple)
@@ -46,10 +47,19 @@ class FilterModule(object):
             return l[0]
     
     @staticmethod
-    def to_map(l, item_key):
-        '''Convert a list into a dict using a given key from each item.'''
-        return {x[item_key]: x for x in l if item_key in x}
-    
+    def to_map(l, item_key, path_delimiter='.'):
+        '''Convert a list l into a dict using a given key from each item.
+        The item_key may be a key path sepapated by path_delimiter.
+        '''
+        res = {}
+        f = lambda z,k: z.get(k) if z else None
+        p = item_key.split(path_delimiter)
+        for x in l:
+            k = reduce(f, p, x)
+            if k:
+                res[k] = x
+        return res
+
     @staticmethod
     def flatten_list(l):
         return reduce(_flatten_list, l, [])
@@ -81,9 +91,9 @@ class FilterModule(object):
         If `source_path` is supplied, then it is expected to be a format string and 
         contain placeholder for the current key item, e.g.:
         
-        >>>  map_keys(d, ['aa', 'bb']) # visits actual and explicitly-defined keys
-        >>>  map_keys(d, ['aa', 'bb'], 'someprefix-{0}')   # visits actual keys 
-        >>>  map_keys(d, ['aa', 'bb'], 'prefix-{0}-suffix.version')  # visits nested keys
+        >>>  map_keys(d, ['aa', 'bb']) # visit actual and explicitly-defined keys
+        >>>  map_keys(d, ['aa', 'bb'], 'someprefix-{0}')   # visit actual keys 
+        >>>  map_keys(d, ['aa', 'bb'], 'prefix-{0}-suffix.version')  # visit nested keys
         
         '''
 
